@@ -1,0 +1,41 @@
+{
+  "universities": [
+    {
+      "name": "Imperial University",
+      "location": "London, Central District",
+      "tuition": 45000,
+      "programs": ["Bachelor's", "Master's", "PhD"],
+      "studentPopulation": 35000,
+      "internationalStudents": 10000,
+      "campusSize": "200 acres",
+      "founded": 1832,
+      "ranking": 15,
+      "researchFocus": "Multi-disciplinary",
+      "notableAlumni": ["Nobel Laureate 1", "Nobel Laureate 2"],
+      "studentToFacultyRatio": "8:1",
+      "acceptanceRate": "15%",
+      "facilities": [
+        "Modern research laboratories",
+        "24/7 library access",
+        "Olympic-size swimming pool",
+        "Student accommodation on campus",
+        "Innovation hub and startup incubator"
+      ],
+      "scholarships": {
+        "available": true,
+        "types": [
+          "Merit-based scholarships up to 100%",
+          "Need-based financial aid",
+          "Sports scholarships"
+        ]
+      },
+      "careerServices": {
+        "employmentRate": "95%",
+        "partnerships": [
+          "Industry partnerships with Fortune 500",
+          "Internship programs with leading companies"
+        ]
+      }
+    }
+  ]
+}

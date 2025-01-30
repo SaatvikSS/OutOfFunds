@@ -1,65 +1,118 @@
 // AI Service for handling AI-related functionality
 class AiService {
+    async makeRequest(endpoint, data) {
+        try {
+            const response = await fetch(`/api/${endpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                throw new Error(`API call failed: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            return result;
+        } catch (error) {
+            console.error(`Error calling ${endpoint} API:`, error);
+            throw error;
+        }
+    }
+
+    formatUniversityData(university) {
+        return `
+            ${university.name}
+            Location: ${university.location}
+            Tuition: ${university.tuition} per year
+            Programs: ${university.programs.join(', ')}
+            Student Population: ${university.studentPopulation}
+            International Students: ${university.internationalStudents}
+            Campus Size: ${university.campusSize}
+            Founded: ${university.founded}
+            QS World Ranking: Top ${university.ranking}
+            Research Focus: ${university.researchFocus}
+            Notable Alumni: ${university.notableAlumni.join(', ')}
+            Student-to-Faculty Ratio: ${university.studentToFacultyRatio}
+            Acceptance Rate: ${university.acceptanceRate}
+            
+            Facilities:
+            ${university.facilities.map(f => '- ' + f).join('\n')}
+            
+            Scholarships Available: ${university.scholarships.available ? 'Yes' : 'No'}
+            ${university.scholarships.types.map(s => '- ' + s).join('\n')}
+            
+            Career Services:
+            - ${university.careerServices.employmentRate} employment rate within 6 months
+            ${university.careerServices.partnerships.map(p => '- ' + p).join('\n')}
+        `;
+    }
+
+    formatJobData(job) {
+        return `
+            ${job.title}
+            Company: ${job.company}
+            Location: ${job.location}
+            Salary: ${job.salary} per year
+            Employment Type: ${job.employmentType}
+            Experience Level: ${job.experienceLevel}
+            Requirements: ${job.requirements}
+            
+            Technical Skills Required:
+            ${job.technicalSkills.map(s => '- ' + s).join('\n')}
+            
+            Benefits:
+            ${job.benefits.map(b => '- ' + b).join('\n')}
+            
+            Career Growth:
+            - ${job.careerGrowth.promotions}
+            ${job.careerGrowth.training.map(t => '- ' + t).join('\n')}
+            
+            Company Culture:
+            ${job.companyCulture.map(c => '- ' + c).join('\n')}
+        `;
+    }
+
+    formatAccommodationData(accommodation) {
+        return `
+            ${accommodation.name}
+            Location: ${accommodation.location}
+            Rent: ${accommodation.rent} per month
+            Room Type: ${accommodation.roomType}
+            Building Type: ${accommodation.buildingType}
+            Distance to Campus: ${accommodation.distanceToCampus} minutes walk
+            
+            Amenities:
+            ${accommodation.amenities.map(a => '- ' + a).join('\n')}
+            
+            Utilities Included:
+            ${accommodation.utilities.map(u => '- ' + u).join('\n')}
+            
+            Community Features:
+            ${accommodation.communityFeatures.map(f => '- ' + f).join('\n')}
+        `;
+    }
+
     async getUniversityRecommendations(criteria) {
+        const response = await this.makeRequest('universities', criteria);
         return {
-            data: `University Recommendations for ${criteria.location}:
-                
-                University of ${criteria.location}
-                Location: ${criteria.location}
-                Tuition: ${criteria.budget} per year
-                Programs: Bachelor's, Master's, PhD
-                
-                ${criteria.location} State University
-                Location: ${criteria.location}
-                Tuition: ${parseInt(criteria.budget) * 0.8} per year
-                Programs: ${criteria.studyLevel}, Research Programs
-                
-                ${criteria.location} Institute of Technology
-                Location: ${criteria.location}
-                Tuition: ${parseInt(criteria.budget) * 1.2} per year
-                Programs: Engineering, Technology, Sciences`
+            data: response.data.map(uni => this.formatUniversityData(uni)).join('\n\n')
         };
     }
 
     async getJobRecommendations(criteria) {
+        const response = await this.makeRequest('jobs', criteria);
         return {
-            data: `Job Opportunities in ${criteria.location}:
-                
-                Software Developer
-                Company: Tech Solutions ${criteria.location}
-                Salary: ${parseInt(criteria.budget) * 0.8} per year
-                Requirements: ${criteria.studyLevel} in Computer Science
-                
-                Research Assistant
-                Company: ${criteria.location} Research Institute
-                Salary: ${parseInt(criteria.budget) * 0.5} per year
-                Requirements: Enrolled in ${criteria.studyLevel}
-                
-                Teaching Assistant
-                Company: University of ${criteria.location}
-                Salary: ${parseInt(criteria.budget) * 0.4} per year
-                Requirements: ${criteria.studyLevel} student`
+            data: response.data.map(job => this.formatJobData(job)).join('\n\n')
         };
     }
 
     async getAccommodationRecommendations(criteria) {
+        const response = await this.makeRequest('accommodation', criteria);
         return {
-            data: `Accommodation Options in ${criteria.location}:
-                
-                Student Residence Hall
-                Location: Near University of ${criteria.location}
-                Rent: ${parseInt(criteria.budget) * 0.3} per month
-                Amenities: Furnished, Utilities Included, Study Areas
-                
-                Shared Apartment
-                Location: ${criteria.location} City Center
-                Rent: ${parseInt(criteria.budget) * 0.25} per month
-                Amenities: Fully Furnished, WiFi, Shared Kitchen
-                
-                Private Studio
-                Location: ${criteria.location} Student District
-                Rent: ${parseInt(criteria.budget) * 0.4} per month
-                Amenities: Private Bathroom, Kitchen, Study Desk`
+            data: response.data.map(acc => this.formatAccommodationData(acc)).join('\n\n')
         };
     }
 

@@ -98,8 +98,7 @@ class Search {
     formatContent(item) {
         if (!item) return '';
         
-        let content = typeof item === 'string' ? item : JSON.stringify(item, null, 2);
-        const lines = content.split('\n')
+        const lines = item.split('\n')
             .map(line => this.cleanText(line))
             .filter(line => line);
             
@@ -118,15 +117,13 @@ class Search {
                     details = [];
                 }
                 currentSection = `<div class="section-heading universities">${cleanLine}</div>`;
-            } else if (line.toLowerCase().includes('job') || 
-                      line.toLowerCase().includes('position')) {
+            } else if (line.toLowerCase().includes('job opportunities')) {
                 if (currentSection && details.length > 0) {
                     formattedHtml += this.formatSection(currentSection, details);
                     details = [];
                 }
                 currentSection = `<div class="section-heading jobs">${cleanLine}</div>`;
-            } else if (line.toLowerCase().includes('accommodation') || 
-                      line.toLowerCase().includes('housing')) {
+            } else if (line.toLowerCase().includes('accommodation options')) {
                 if (currentSection && details.length > 0) {
                     formattedHtml += this.formatSection(currentSection, details);
                     details = [];

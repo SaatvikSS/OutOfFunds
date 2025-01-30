@@ -1,4 +1,5 @@
-const universitiesData = require('./data/universities.json');
+const data = require('./data/universities.json');
+const universitiesData = data.universities;
 
 module.exports = async (req, res) => {
     if (req.method !== 'POST') {

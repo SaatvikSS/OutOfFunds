@@ -1,4 +1,5 @@
-const accommodationData = require('./data/accommodation.json');
+const data = require('./data/accommodation.json');
+const accommodationData = data.accommodation;
 
 module.exports = async (req, res) => {
     if (req.method !== 'POST') {

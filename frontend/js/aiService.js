@@ -11,11 +11,11 @@ class AiService {
             });
 
             if (!response.ok) {
-                throw new Error(`API call failed: ${response.statusText}`);
+                const errorData = await response.json().catch(() => ({ error: response.statusText }));
+                throw new Error(errorData.error || `API call failed: ${response.statusText}`);
             }
 
-            const result = await response.json();
-            return result;
+            return await response.json();
         } catch (error) {
             console.error(`Error calling ${endpoint} API:`, error);
             throw error;
@@ -23,6 +23,7 @@ class AiService {
     }
 
     formatUniversityData(university) {
+        if (!university) return '';
         return `
             ${university.name}
             Location: ${university.location}
@@ -51,6 +52,7 @@ class AiService {
     }
 
     formatJobData(job) {
+        if (!job) return '';
         return `
             ${job.title}
             Company: ${job.company}
@@ -76,6 +78,7 @@ class AiService {
     }
 
     formatAccommodationData(accommodation) {
+        if (!accommodation) return '';
         return `
             ${accommodation.name}
             Location: ${accommodation.location}
@@ -96,24 +99,39 @@ class AiService {
     }
 
     async getUniversityRecommendations(criteria) {
-        const response = await this.makeRequest('universities', criteria);
-        return {
-            data: response.data.map(uni => this.formatUniversityData(uni)).join('\n\n')
-        };
+        try {
+            const response = await this.makeRequest('universities', criteria);
+            return {
+                data: response.data.map(uni => this.formatUniversityData(uni)).join('\n\n')
+            };
+        } catch (error) {
+            console.error('Error getting university recommendations:', error);
+            return { error: error.message };
+        }
     }
 
     async getJobRecommendations(criteria) {
-        const response = await this.makeRequest('jobs', criteria);
-        return {
-            data: response.data.map(job => this.formatJobData(job)).join('\n\n')
-        };
+        try {
+            const response = await this.makeRequest('jobs', criteria);
+            return {
+                data: response.data.map(job => this.formatJobData(job)).join('\n\n')
+            };
+        } catch (error) {
+            console.error('Error getting job recommendations:', error);
+            return { error: error.message };
+        }
     }
 
     async getAccommodationRecommendations(criteria) {
-        const response = await this.makeRequest('accommodation', criteria);
-        return {
-            data: response.data.map(acc => this.formatAccommodationData(acc)).join('\n\n')
-        };
+        try {
+            const response = await this.makeRequest('accommodation', criteria);
+            return {
+                data: response.data.map(acc => this.formatAccommodationData(acc)).join('\n\n')
+            };
+        } catch (error) {
+            console.error('Error getting accommodation recommendations:', error);
+            return { error: error.message };
+        }
     }
 
     async getRecommendations(criteria) {
@@ -127,11 +145,17 @@ class AiService {
             return {
                 universities: universities.data ? [universities.data] : [],
                 jobs: jobs.data ? [jobs.data] : [],
-                accommodation: accommodation.data ? [accommodation.data] : []
+                accommodation: accommodation.data ? [accommodation.data] : [],
+                error: universities.error || jobs.error || accommodation.error
             };
         } catch (error) {
             console.error('Error getting recommendations:', error);
-            throw error;
+            return {
+                universities: [],
+                jobs: [],
+                accommodation: [],
+                error: error.message
+            };
         }
     }
 }

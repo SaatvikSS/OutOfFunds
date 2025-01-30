@@ -1,163 +1,64 @@
 // AI Service for handling AI-related functionality
-class AiService {
-    async makeRequest(endpoint, data) {
+class AIService {
+    constructor() {
+        this.baseUrl = 'http://localhost:3002/api/search';
+    }
+
+    async makeRequest(endpoint, criteria) {
         try {
-            const response = await fetch(`/api/${endpoint}`, {
+            const response = await fetch(`${this.baseUrl}/${endpoint}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(criteria)
             });
 
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ error: response.statusText }));
-                throw new Error(errorData.error || `API call failed: ${response.statusText}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            return await response.json();
+            const data = await response.json();
+            console.log(`${endpoint} response:`, data);
+            return data || null;
         } catch (error) {
-            console.error(`Error calling ${endpoint} API:`, error);
-            throw error;
-        }
-    }
-
-    formatUniversityData(university) {
-        if (!university) return '';
-        return `
-            ${university.name}
-            Location: ${university.location}
-            Tuition: ${university.tuition} per year
-            Programs: ${university.programs.join(', ')}
-            Student Population: ${university.studentPopulation}
-            International Students: ${university.internationalStudents}
-            Campus Size: ${university.campusSize}
-            Founded: ${university.founded}
-            QS World Ranking: Top ${university.ranking}
-            Research Focus: ${university.researchFocus}
-            Notable Alumni: ${university.notableAlumni.join(', ')}
-            Student-to-Faculty Ratio: ${university.studentToFacultyRatio}
-            Acceptance Rate: ${university.acceptanceRate}
-            
-            Facilities:
-            ${university.facilities.map(f => '- ' + f).join('\n')}
-            
-            Scholarships Available: ${university.scholarships.available ? 'Yes' : 'No'}
-            ${university.scholarships.types.map(s => '- ' + s).join('\n')}
-            
-            Career Services:
-            - ${university.careerServices.employmentRate} employment rate within 6 months
-            ${university.careerServices.partnerships.map(p => '- ' + p).join('\n')}
-        `;
-    }
-
-    formatJobData(job) {
-        if (!job) return '';
-        return `
-            ${job.title}
-            Company: ${job.company}
-            Location: ${job.location}
-            Salary: ${job.salary} per year
-            Employment Type: ${job.employmentType}
-            Experience Level: ${job.experienceLevel}
-            Requirements: ${job.requirements}
-            
-            Technical Skills Required:
-            ${job.technicalSkills.map(s => '- ' + s).join('\n')}
-            
-            Benefits:
-            ${job.benefits.map(b => '- ' + b).join('\n')}
-            
-            Career Growth:
-            - ${job.careerGrowth.promotions}
-            ${job.careerGrowth.training.map(t => '- ' + t).join('\n')}
-            
-            Company Culture:
-            ${job.companyCulture.map(c => '- ' + c).join('\n')}
-        `;
-    }
-
-    formatAccommodationData(accommodation) {
-        if (!accommodation) return '';
-        return `
-            ${accommodation.name}
-            Location: ${accommodation.location}
-            Rent: ${accommodation.rent} per month
-            Room Type: ${accommodation.roomType}
-            Building Type: ${accommodation.buildingType}
-            Distance to Campus: ${accommodation.distanceToCampus} minutes walk
-            
-            Amenities:
-            ${accommodation.amenities.map(a => '- ' + a).join('\n')}
-            
-            Utilities Included:
-            ${accommodation.utilities.map(u => '- ' + u).join('\n')}
-            
-            Community Features:
-            ${accommodation.communityFeatures.map(f => '- ' + f).join('\n')}
-        `;
-    }
-
-    async getUniversityRecommendations(criteria) {
-        try {
-            const response = await this.makeRequest('universities', criteria);
-            return {
-                data: response.data.map(uni => this.formatUniversityData(uni)).join('\n\n')
-            };
-        } catch (error) {
-            console.error('Error getting university recommendations:', error);
-            return { error: error.message };
-        }
-    }
-
-    async getJobRecommendations(criteria) {
-        try {
-            const response = await this.makeRequest('jobs', criteria);
-            return {
-                data: response.data.map(job => this.formatJobData(job)).join('\n\n')
-            };
-        } catch (error) {
-            console.error('Error getting job recommendations:', error);
-            return { error: error.message };
-        }
-    }
-
-    async getAccommodationRecommendations(criteria) {
-        try {
-            const response = await this.makeRequest('accommodation', criteria);
-            return {
-                data: response.data.map(acc => this.formatAccommodationData(acc)).join('\n\n')
-            };
-        } catch (error) {
-            console.error('Error getting accommodation recommendations:', error);
-            return { error: error.message };
+            console.error(`Error in ${endpoint} request:`, error);
+            return null;
         }
     }
 
     async getRecommendations(criteria) {
         try {
-            const [universities, jobs, accommodation] = await Promise.all([
-                this.getUniversityRecommendations(criteria),
-                this.getJobRecommendations(criteria),
-                this.getAccommodationRecommendations(criteria)
+            console.log('Searching with criteria:', criteria);
+
+            // Make all requests in parallel
+            const [universitiesRes, jobsRes, accommodationRes] = await Promise.all([
+                this.makeRequest('universities', criteria),
+                this.makeRequest('jobs', criteria),
+                this.makeRequest('accommodation', criteria)
             ]);
 
-            return {
-                universities: universities.data ? [universities.data] : [],
-                jobs: jobs.data ? [jobs.data] : [],
-                accommodation: accommodation.data ? [accommodation.data] : [],
-                error: universities.error || jobs.error || accommodation.error
+            // Ensure each section has a valid array
+            const results = {
+                universities: Array.isArray(universitiesRes?.universities) ? universitiesRes.universities : [],
+                jobs: Array.isArray(jobsRes?.jobs) ? jobsRes.jobs : [],
+                accommodations: Array.isArray(accommodationRes?.accommodations) ? accommodationRes.accommodations : []
             };
+
+            console.log('Processed results:', results);
+            return results;
         } catch (error) {
             console.error('Error getting recommendations:', error);
+            // Return empty arrays for all sections in case of error
             return {
                 universities: [],
                 jobs: [],
-                accommodation: [],
-                error: error.message
+                accommodations: []
             };
         }
     }
 }
 
-export const aiService = new AiService();
+// Export a single instance
+const aiService = new AIService();
+export { aiService };

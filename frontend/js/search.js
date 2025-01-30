@@ -1,216 +1,154 @@
-import { aiService } from './aiService.js';
+console.log('Search.js loaded');
 
-document.addEventListener('DOMContentLoaded', () => {
-    class Search {
-        constructor() {
-            this.form = document.getElementById('searchForm');
-            this.resultsContent = document.getElementById('results-content');
-            this.resultsSection = document.querySelector('.results-section');
-            this.submitButton = this.form.querySelector('button[type="submit"]');
-            this.results = {};
-            this.activeTab = 'universities';
-            this.init();
-        }
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded');
+    
+    const form = document.getElementById('searchForm');
+    const resultsDiv = document.getElementById('resultsContainer');
+    let searchResults = null;
 
-        init() {
-            if (this.form) {
-                this.form.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    await this.handleSubmit();
-                });
-            }
-        }
+    // Tab handling
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanes = document.querySelectorAll('.tab-pane');
 
-        async handleSubmit() {
-            try {
-                // Disable submit button and show loading state
-                this.submitButton.disabled = true;
-                this.submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
-
-                // Get form data
-                const location = document.getElementById('location').value;
-                const budget = document.getElementById('budget').value;
-                const studyLevel = document.getElementById('studyLevel').value;
-
-                // Validate form data
-                if (!location || !budget || !studyLevel) {
-                    throw new Error('Please fill in all fields');
-                }
-
-                // Show loading state in results
-                this.resultsSection.style.display = 'block';
-                this.resultsContent.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: #666;">
-                        <i class="fas fa-spinner fa-spin fa-3x"></i>
-                        <p style="margin-top: 20px;">Searching for the best matches...</p>
-                    </div>
-                `;
-
-                // Make API call
-                const searchData = {
-                    location: location,
-                    budget: budget,
-                    studyLevel: studyLevel,
-                    minResults: 5
-                };
-
-                // Get recommendations using aiService
-                const response = await aiService.getRecommendations(searchData);
-                
-                // Store results
-                this.results = response;
-
-                // Display results
-                this.displayResults();
-
-                // Scroll to results
-                this.resultsContent.scrollIntoView({ behavior: 'smooth' });
-
-            } catch (error) {
-                console.error('Search error:', error);
-                
-                // Show error message
-                this.resultsSection.style.display = 'block';
-                this.resultsContent.innerHTML = `
-                    <div style="text-align: center; padding: 40px; background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                        <i class="fas fa-exclamation-circle" style="color: #dc3545; font-size: 48px;"></i>
-                        <p style="color: #dc3545; font-size: 18px; margin-top: 20px; font-weight: bold;">Search Failed</p>
-                        <p style="color: #666; margin-top: 10px;">${error.message || 'An error occurred while searching. Please try again.'}</p>
-                    </div>
-                `;
-
-            } finally {
-                // Reset submit button
-                this.submitButton.disabled = false;
-                this.submitButton.innerHTML = '<i class="fas fa-search"></i> Search';
-            }
-        }
-
-        switchTab(tabName) {
-            this.activeTab = tabName;
-            this.displayResults();
-        }
-
-        cleanText(text) {
-            if (!text) return '';
-            return text.replace(/[*#]/g, '').trim();
-        }
-
-        formatContent(item) {
-            if (!item) return '';
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const tabName = button.dataset.tab;
             
-            const lines = item.split('\n')
-                .map(line => this.cleanText(line))
-                .filter(line => line);
-                
-            let formattedHtml = '<div class="result-item">';
-            let currentSection = '';
-            let details = [];
+            // Update active states
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabPanes.forEach(pane => pane.classList.remove('active'));
             
-            lines.forEach(line => {
-                const cleanLine = this.cleanText(line);
-                
-                if (line.toLowerCase().includes('university') || 
-                    line.toLowerCase().includes('college') || 
-                    line.toLowerCase().includes('institute')) {
-                    if (currentSection && details.length > 0) {
-                        formattedHtml += this.formatSection(currentSection, details);
-                        details = [];
-                    }
-                    currentSection = `<div class="section-heading universities">${cleanLine}</div>`;
-                } else if (line.toLowerCase().includes('job opportunities')) {
-                    if (currentSection && details.length > 0) {
-                        formattedHtml += this.formatSection(currentSection, details);
-                        details = [];
-                    }
-                    currentSection = `<div class="section-heading jobs">${cleanLine}</div>`;
-                } else if (line.toLowerCase().includes('accommodation options')) {
-                    if (currentSection && details.length > 0) {
-                        formattedHtml += this.formatSection(currentSection, details);
-                        details = [];
-                    }
-                    currentSection = `<div class="section-heading accommodation">${cleanLine}</div>`;
+            button.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+
+            // If we have results, update the content
+            if (searchResults) {
+                updateTabContent(tabName, searchResults);
+            }
+        });
+    });
+
+    function updateTabContent(tabName, data) {
+        const tabContent = document.getElementById(tabName);
+        let html = '';
+
+        switch(tabName) {
+            case 'universities':
+                if (data.universities && data.universities.length > 0) {
+                    data.universities.forEach(uni => {
+                        html += `
+                            <div class="card">
+                                <h3>${uni.name || 'University Name Not Available'}</h3>
+                                <p><strong>Location:</strong> ${uni.location || 'Location Not Available'}</p>
+                                <p><strong>Tuition:</strong> ${uni.tuition ? '$' + uni.tuition : 'Not Available'}</p>
+                                <p>${uni.description || 'No description available'}</p>
+                            </div>
+                        `;
+                    });
                 } else {
-                    details.push(cleanLine);
+                    html = '<div class="no-results">No universities found matching your criteria.</div>';
                 }
-            });
-            
-            if (currentSection && details.length > 0) {
-                formattedHtml += this.formatSection(currentSection, details);
-            }
-            
-            formattedHtml += '</div>';
-            return formattedHtml;
-        }
+                break;
 
-        formatSection(heading, details) {
-            let html = heading + '<div class="details-container">';
-            
-            details.forEach(detail => {
-                if (detail.includes(':')) {
-                    const [label, value] = detail.split(':').map(part => part.trim());
-                    html += `
-                        <div class="detail-row">
-                            <div class="detail-label">${label}:</div>
-                            <div class="detail-value">${value}</div>
-                        </div>`;
+            case 'jobs':
+                if (data.jobs && data.jobs.length > 0) {
+                    data.jobs.forEach(job => {
+                        html += `
+                            <div class="card">
+                                <h3>${job.title || 'Job Title Not Available'}</h3>
+                                <p><strong>Company:</strong> ${job.company || 'Company Not Available'}</p>
+                                <p><strong>Location:</strong> ${job.location || 'Location Not Available'}</p>
+                                <p><strong>Type:</strong> ${job.type || 'Part-time'}</p>
+                                <p><strong>Hours:</strong> ${job.hours || 'Up to 20-25 hours per week'}</p>
+                                <p><strong>Schedule:</strong> ${job.schedule || 'Flexible hours'}</p>
+                                <p><strong>Pay Rate:</strong> ${job.salary || 'Not Available'}</p>
+                                <p>${job.description || 'No description available'}</p>
+                            </div>
+                        `;
+                    });
                 } else {
-                    html += `<div class="detail-text">${detail}</div>`;
+                    html = '<div class="no-results">No part-time student jobs found matching your criteria.</div>';
                 }
-            });
-            
-            html += '</div>';
-            return html;
+                break;
+
+            case 'accommodations':
+                if (data.accommodations && data.accommodations.length > 0) {
+                    data.accommodations.forEach(acc => {
+                        html += `
+                            <div class="card">
+                                <h3>${acc.name || 'Accommodation Name Not Available'}</h3>
+                                <p><strong>Type:</strong> ${acc.type || 'Type Not Available'}</p>
+                                <p><strong>Location:</strong> ${acc.location || 'Location Not Available'}</p>
+                                <p><strong>Monthly Rent:</strong> ${acc.rent ? '$' + acc.rent : 'Not Available'}</p>
+                                <p>${acc.description || 'No description available'}</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html = '<div class="no-results">No accommodations found matching your criteria.</div>';
+                }
+                break;
         }
 
-        displayResults() {
-            if (!this.resultsContent) return;
-
-            const sections = {
-                universities: this.results.universities || [],
-                jobs: this.results.jobs || [],
-                accommodation: this.results.accommodation || []
-            };
-
-            let resultsHtml = `
-                <div class="results-container">
-                    <div class="tabs-container">
-                        <button class="tab-button universities ${this.activeTab === 'universities' ? 'active' : ''}"
-                                onclick="searchInstance.switchTab('universities')">
-                            <i class="fas fa-university"></i> Universities
-                        </button>
-                        <button class="tab-button jobs ${this.activeTab === 'jobs' ? 'active' : ''}"
-                                onclick="searchInstance.switchTab('jobs')">
-                            <i class="fas fa-briefcase"></i> Jobs
-                        </button>
-                        <button class="tab-button accommodation ${this.activeTab === 'accommodation' ? 'active' : ''}"
-                                onclick="searchInstance.switchTab('accommodation')">
-                            <i class="fas fa-home"></i> Accommodation
-                        </button>
-                    </div>
-                    <div class="tab-content">`;
-
-            if (!sections[this.activeTab] || sections[this.activeTab].length === 0) {
-                resultsHtml += `
-                    <div class="no-results">
-                        <i class="fas fa-search"></i>
-                        <p>No ${this.activeTab} found matching your criteria.</p>
-                    </div>`;
-            } else {
-                sections[this.activeTab].forEach(item => {
-                    resultsHtml += this.formatContent(item);
-                });
-            }
-
-            resultsHtml += `
-                    </div>
-                </div>`;
-            
-            this.resultsContent.innerHTML = resultsHtml;
-        }
+        tabContent.innerHTML = html;
     }
 
-    // Initialize search and make it globally available
-    const searchInstance = new Search();
-    window.searchInstance = searchInstance;
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        console.log('Form submitted');
+        
+        try {
+            // Show loading state
+            resultsDiv.style.display = 'block';
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.innerHTML = '<div class="loading">Searching for recommendations...</div>';
+            });
+
+            // Get form data
+            const formData = {
+                location: form.querySelector('[name="location"]').value,
+                budget: form.querySelector('[name="budget"]').value,
+                fieldOfStudy: form.querySelector('[name="fieldOfStudy"]').value,
+                studyLevel: form.querySelector('[name="studyLevel"]').value
+            };
+
+            console.log('Form data:', formData);
+
+            // Make the request
+            const response = await fetch('http://localhost:3002/api/search/recommendations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Response data:', data);
+            
+            // Store the results
+            searchResults = data;
+
+            // Update the active tab content
+            const activeTab = document.querySelector('.tab-button.active').dataset.tab;
+            updateTabContent(activeTab, data);
+
+        } catch (error) {
+            console.error('Search error:', error);
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.innerHTML = `
+                    <div class="error">
+                        <h3>Search Failed</h3>
+                        <p>An error occurred while searching. Please try again.</p>
+                        <p>Error details: ${error.message}</p>
+                    </div>
+                `;
+            });
+        }
+    });
 });

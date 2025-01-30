@@ -116,11 +116,30 @@
             transition: all 0.3s;
         }
 
+        .form-group select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+            cursor: pointer;
+        }
+
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+        }
+
+        .form-group select:hover {
+            border-color: var(--primary-color);
+        }
+
+        .form-group select option {
+            padding: 0.5rem;
         }
 
         .submit-btn {
@@ -152,10 +171,52 @@
         }
 
         .results-section {
-            padding: 2rem; 
-            max-width: 1200px; 
+            padding: 2rem;
+            max-width: 1200px;
             margin: 0 auto;
-            display: none;
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .university-card {
+            border-left: 4px solid #007AFF;
+        }
+
+        .job-card {
+            border-left: 4px solid #28a745;
+        }
+
+        .accommodation-card {
+            border-left: 4px solid #fd7e14;
+        }
+
+        section h2 {
+            color: #333;
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .error {
+            text-align: center;
+            padding: 2rem;
+            color: #dc3545;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .results-list {
@@ -264,18 +325,6 @@
             color: #fd7e14;
         }
 
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: var(--secondary-text);
-        }
-
-        .error {
-            text-align: center;
-            padding: 2rem;
-            color: #FF3B30;
-        }
-
         .no-results {
             text-align: center;
             padding: 2rem;
@@ -340,6 +389,75 @@
             font-size: 18px;
         }
 
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .result-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .result-icon {
+            font-size: 24px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .result-details {
+            font-size: 14px;
+        }
+
+        .detail-heading {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 8px;
+            align-items: flex-start;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: var(--text-color);
+            min-width: 120px;
+            margin-right: 10px;
+        }
+
+        .detail-value {
+            color: var(--secondary-text);
+            flex: 1;
+        }
+
+        .detail-bullet {
+            color: var(--secondary-text);
+            margin-left: 20px;
+            position: relative;
+            margin-bottom: 5px;
+        }
+
+        .detail-bullet:before {
+            content: "•";
+            position: absolute;
+            left: -15px;
+            color: var(--primary-color);
+        }
+
         @media (max-width: 768px) {
             .search-section {
                 padding: 6rem 1rem 2rem;
@@ -352,6 +470,70 @@
             .results-section {
                 padding: 1rem;
             }
+        }
+
+        .tabs-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: none;
+            color: var(--text-color);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-button i {
+            font-size: 1.2rem;
+        }
+
+        .tab-button:hover {
+            background: var(--surface-color);
+        }
+
+        .tab-button.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .tab-content {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        #universities .card {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        #jobs .card {
+            border-left: 4px solid #28a745;
+        }
+
+        #accommodations .card {
+            border-left: 4px solid #fd7e14;
         }
     </style>
 </head>
@@ -370,7 +552,7 @@
     </nav>
 
     <div class="search-section">
-        <form id="searchForm" class="search-form" onsubmit="return false;">
+        <form id="searchForm" class="search-form">
             <div class="form-group">
                 <label for="location">Location</label>
                 <input type="text" id="location" name="location" placeholder="Enter your preferred location" required>
@@ -380,12 +562,30 @@
                 <input type="text" id="budget" name="budget" placeholder="Enter your budget" required>
             </div>
             <div class="form-group">
-                <label for="studyLevel">Study Level</label>
+                <label for="fieldOfStudy">Field of Study</label>
+                <select id="fieldOfStudy" name="fieldOfStudy" required>
+                    <option value="">Select field of study</option>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Business Administration">Business Administration</option>
+                    <option value="Engineering">Engineering</option>
+                    <option value="Medicine">Medicine</option>
+                    <option value="Law">Law</option>
+                    <option value="Arts">Arts</option>
+                    <option value="Science">Science</option>
+                    <option value="Economics">Economics</option>
+                    <option value="Psychology">Psychology</option>
+                    <option value="Education">Education</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="studyLevel">Level of Study</label>
                 <select id="studyLevel" name="studyLevel" required>
-                    <option value="">Select study level</option>
-                    <option value="undergraduate">Undergraduate</option>
-                    <option value="postgraduate">Postgraduate</option>
-                    <option value="phd">PhD</option>
+                    <option value="">Select level of study</option>
+                    <option value="Undergraduate">Undergraduate (Bachelor's)</option>
+                    <option value="Postgraduate">Postgraduate (Master's)</option>
+                    <option value="Doctorate">Doctorate (PhD)</option>
+                    <option value="Diploma">Diploma</option>
+                    <option value="Certificate">Certificate</option>
                 </select>
             </div>
             <button type="submit" class="submit-btn">
@@ -395,10 +595,25 @@
         </form>
     </div>
 
-    <div class="results-section" style="padding: 2rem; max-width: 1200px; margin: 0 auto;">
-        <div id="results-content" style="margin: 0 auto;"></div>
+    <div id="resultsContainer" class="results-section">
+        <div class="tabs-container">
+            <button class="tab-button active" data-tab="universities">
+                <i class="fas fa-university"></i> Universities
+            </button>
+            <button class="tab-button" data-tab="jobs">
+                <i class="fas fa-briefcase"></i> Part-Time Jobs
+            </button>
+            <button class="tab-button" data-tab="accommodations">
+                <i class="fas fa-home"></i> Accommodations
+            </button>
+        </div>
+        <div class="tab-content">
+            <div id="universities" class="tab-pane active"></div>
+            <div id="jobs" class="tab-pane"></div>
+            <div id="accommodations" class="tab-pane"></div>
+        </div>
     </div>
 
-    <script type="module" src="./js/search.js"></script>
+    <script src="js/search.js"></script>
 </body>
 </html>

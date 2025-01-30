@@ -7,23 +7,25 @@ module.exports = async (req, res) => {
     }
 
     try {
-        const { location, budget } = req.body;
+        const { location = '', budget = '0' } = req.body;
 
         // Filter accommodation based on criteria
         const filteredAccommodation = accommodationData.filter(acc => {
-            return acc.location.toLowerCase().includes(location.toLowerCase()) &&
-                   acc.rent <= parseInt(budget) * 0.4; // Assuming rent should be max 40% of budget
+            const locationMatch = !location || acc.location.toLowerCase().includes(location.toLowerCase());
+            const budgetMatch = !budget || acc.rent <= parseInt(budget || '0') * 0.4; // Assuming rent should be max 40% of budget
+
+            return locationMatch && budgetMatch;
         });
 
-        // Sort by distance to university
-        const sortedAccommodation = filteredAccommodation.sort((a, b) => 
-            parseInt(a.distanceToCampus) - parseInt(b.distanceToCampus)
-        );
+        // If no results, return all accommodation
+        const results = filteredAccommodation.length > 0 ? filteredAccommodation : accommodationData;
 
-        // Take top 5 results
-        const results = sortedAccommodation.slice(0, 5);
+        // Sort by distance to university and take top 5
+        const sortedResults = results
+            .sort((a, b) => parseInt(a.distanceToCampus) - parseInt(b.distanceToCampus))
+            .slice(0, 5);
 
-        res.status(200).json({ data: results });
+        res.status(200).json({ data: sortedResults });
     } catch (error) {
         console.error('Error in accommodation API:', error);
         res.status(500).json({ error: 'Internal server error' });

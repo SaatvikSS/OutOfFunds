@@ -7,22 +7,27 @@ module.exports = async (req, res) => {
     }
 
     try {
-        const { location, budget, studyLevel } = req.body;
+        const { location = '', budget = '0', studyLevel = '' } = req.body;
 
         // Filter universities based on criteria
         const filteredUniversities = universitiesData.filter(uni => {
-            return uni.location.toLowerCase().includes(location.toLowerCase()) &&
-                   uni.tuition <= parseInt(budget) &&
-                   uni.programs.some(prog => prog.toLowerCase().includes(studyLevel.toLowerCase()));
+            const locationMatch = !location || uni.location.toLowerCase().includes(location.toLowerCase());
+            const budgetMatch = !budget || uni.tuition <= parseInt(budget || '0');
+            const studyLevelMatch = !studyLevel || uni.programs.some(prog => 
+                prog.toLowerCase().includes(studyLevel.toLowerCase()) ||
+                studyLevel.toLowerCase().includes(prog.toLowerCase())
+            );
+
+            return locationMatch && budgetMatch && studyLevelMatch;
         });
 
-        // Sort by ranking
-        const sortedUniversities = filteredUniversities.sort((a, b) => a.ranking - b.ranking);
+        // If no results, return all universities
+        const results = filteredUniversities.length > 0 ? filteredUniversities : universitiesData;
 
-        // Take top 5 results
-        const results = sortedUniversities.slice(0, 5);
+        // Sort by ranking and take top 5
+        const sortedResults = results.sort((a, b) => a.ranking - b.ranking).slice(0, 5);
 
-        res.status(200).json({ data: results });
+        res.status(200).json({ data: sortedResults });
     } catch (error) {
         console.error('Error in universities API:', error);
         res.status(500).json({ error: 'Internal server error' });

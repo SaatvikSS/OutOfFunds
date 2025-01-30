@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - EdVenturer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --text-color: #1D1D1F;
+            --background-color: #FFFFFF;
+            --secondary-text: #86868B;
+            --border-color: #E5E5E5;
+            --surface-color: #F5F5F7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .website-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .about-section {
+            padding: 120px 2rem 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .about-content {
+            background: var(--surface-color);
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .about-content h1 {
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            font-size: 2.5rem;
+        }
+
+        .about-content p {
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+        }
+
+        .mission-values {
+            margin-top: 3rem;
+        }
+
+        .mission-values h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .value-card {
+            background: var(--background-color);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .value-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="index.html" class="logo-container">
+            <img src="images/WhatsApp Image 2025-01-30 at 04.14.51.jpeg" alt="EdVenturer Logo" class="logo-img">
+            <span class="website-name">EdVenturer</span>
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+            <a href="search.html">Search</a>
+        </div>
+    </nav>
+
+    <section class="about-section">
+        <div class="about-content">
+            <h1>About EdVenturer</h1>
+            <p>EdVenturer is your ultimate companion in the journey of international education. We understand that studying abroad is more than just choosing a university - it's about embarking on a life-changing adventure that shapes your future.</p>
+            
+            <p>Founded with the vision to simplify the study abroad process, EdVenturer brings together educational opportunities, accommodation options, and career prospects all in one platform. We're dedicated to helping students make informed decisions about their educational journey abroad.</p>
+
+            <div class="mission-values">
+                <h2>Our Mission & Values</h2>
+                <div class="values-grid">
+                    <div class="value-card">
+                        <h3>Student Success</h3>
+                        <p>We put students first, ensuring they have all the resources and support needed to succeed in their educational journey.</p>
+                    </div>
+                    <div class="value-card">
+                        <h3>Innovation</h3>
+                        <p>We leverage cutting-edge technology to provide the most efficient and user-friendly experience for our users.</p>
+                    </div>
+                    <div class="value-card">
+                        <h3>Integrity</h3>
+                        <p>We maintain the highest standards of honesty and transparency in all our operations and recommendations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>

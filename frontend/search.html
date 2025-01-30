@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search - EdVenturer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007AFF;
+            --text-color: #1D1D1F;
+            --background-color: #FFFFFF;
+            --secondary-text: #86868B;
+            --border-color: #E5E5E5;
+            --surface-color: #F5F5F7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background: var(--background-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .website-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .search-section {
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+            background: var(--surface-color);
+        }
+
+        .search-form {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--background-color);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--background-color);
+            color: var(--text-color);
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: white;
+            background: var(--primary-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .submit-btn:hover {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:disabled {
+            background: var(--secondary-text);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-section {
+            padding: 2rem; 
+            max-width: 1200px; 
+            margin: 0 auto;
+            display: none;
+        }
+
+        .results-list {
+            background: var(--background-color);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-item {
+            white-space: pre-wrap;
+            font-family: inherit;
+            line-height: 1.8;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
+        
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-item .detail-row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 20px;
+            align-items: start;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .result-item .detail-label {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 16px;
+        }
+
+        .result-item .detail-value {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #2c3e50;
+        }
+
+        .result-item .detail-text {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .tab-button {
+            font-size: 16px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .tab-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab-button.active {
+            color: white;
+        }
+
+        .tab-button.universities {
+            background: #007AFF;
+        }
+
+        .tab-button.jobs {
+            background: #28a745;
+        }
+
+        .tab-button.accommodation {
+            background: #fd7e14;
+        }
+
+        .section-heading {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #E5E5E5;
+        }
+
+        .section-heading.universities {
+            color: #007AFF;
+        }
+
+        .section-heading.jobs {
+            color: #28a745;
+        }
+
+        .section-heading.accommodation {
+            color: #fd7e14;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--secondary-text);
+        }
+
+        .error {
+            text-align: center;
+            padding: 2rem;
+            color: #FF3B30;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: var(--secondary-text);
+        }
+
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--secondary-text);
+        }
+
+        .section {
+            padding: 4rem 2rem;
+            background: var(--surface-color);
+        }
+
+        .contact-info {
+            margin-top: 1rem;
+        }
+
+        .results-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .tabs-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #E5E5E5;
+        }
+
+        .tab-content {
+            padding: 25px;
+            background: #fff;
+        }
+
+        .details-container {
+            display: grid;
+            gap: 15px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #86868B;
+        }
+
+        .no-results i {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .no-results p {
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .search-section {
+                padding: 6rem 1rem 2rem;
+            }
+
+            .search-form {
+                padding: 1.5rem;
+            }
+
+            .results-section {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="index.html" class="logo-container">
+            <img src="images/WhatsApp Image 2025-01-30 at 04.14.51.jpeg" alt="EdVenturer Logo" class="logo-img">
+            <span class="website-name">EdVenturer</span>
+        </a>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="contact.html">Contact</a>
+            <a href="search.html">Search</a>
+        </div>
+    </nav>
+
+    <div class="search-section">
+        <form id="searchForm" class="search-form" onsubmit="return false;">
+            <div class="form-group">
+                <label for="location">Location</label>
+                <input type="text" id="location" name="location" placeholder="Enter your preferred location" required>
+            </div>
+            <div class="form-group">
+                <label for="budget">Budget(USD)</label>
+                <input type="text" id="budget" name="budget" placeholder="Enter your budget" required>
+            </div>
+            <div class="form-group">
+                <label for="studyLevel">Study Level</label>
+                <select id="studyLevel" name="studyLevel" required>
+                    <option value="">Select study level</option>
+                    <option value="undergraduate">Undergraduate</option>
+                    <option value="postgraduate">Postgraduate</option>
+                    <option value="phd">PhD</option>
+                </select>
+            </div>
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-search"></i>
+                <span>Search</span>
+            </button>
+        </form>
+    </div>
+
+    <div class="results-section" style="padding: 2rem; max-width: 1200px; margin: 0 auto;">
+        <div id="results-content" style="margin: 0 auto;"></div>
+    </div>
+
+    <script type="module">
+        import { aiService } from './js/aiService.js';
+        import './js/search.js';
+    </script>
+</body>
+</html>
